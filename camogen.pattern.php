@@ -145,7 +145,7 @@ class Pattern
 			// Polygon size
 			self::check_parameter_value(array('polygon_size'), 'polygon size', array('valid_array_key','is_integer'));
 
-			self::$polygon_size = (int) max(1, abs($parameters['polygon_size']));
+			self::$polygon_size = (int) max(10, abs($parameters['polygon_size']));
 
 			// Polygon draw style
 			if (array_key_exists('polygon_draw_style', $parameters)) {

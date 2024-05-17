@@ -85,7 +85,7 @@ class Helper
 		// Split edge A
 		$new_vert_a = Helper::edge_split($va1, $va2, $frac_a);
 
-		// Split bdge B
+		// Split edge B
 		$new_vert_b = Helper::edge_split($vb1, $vb2, $frac_b);
 
 		return array($new_vert_a, $new_vert_b);
@@ -571,7 +571,6 @@ class Helper
 				// Randomize the end point and control point positions slightly to draw imperfect
 				// curves
 				$rain_x_pos_rand = $rain_x_pos + rand(-2, 2);
-				//$rain_x_pos_rand = $rain_x_pos;
 				$rain_stroke_segment_length_rand = $rain_stroke_segment_length + rand(-2, 2);
 
 				$points = array();
@@ -581,7 +580,6 @@ class Helper
 					// right, then back again, to create the illusion of a straight or wavy line
 					// depending on the rain stroke width value
 					$rain_stroke_width_rand = Pattern::$rain_stroke_width + rand(-$rain_stroke_width_frac, $rain_stroke_width_frac);
-					//$rain_stroke_width_rand = Pattern::$rain_stroke_width;
 
 					if ($j % 2 == 1) {
 						// Left side of curve
