@@ -33,6 +33,8 @@
 ini_set('display_errors', 1);
 error_reporting(-1);
 
+define('CAMOGEN_VERSION', '0.1a');
+
 require_once('camogen.vertex.php');
 require_once('camogen.polygon.php');
 require_once('camogen.pattern.php');
@@ -54,15 +56,27 @@ try {
 	die($e->getMessage());
 }
 
+// Dependency check for SVG export; if you do not intend to use the SVG export facility or do not
+// have the SimpleXML extension installed you can comment-out this try/catch block
+try {
+	if (extension_loaded('simplexml')) {
+		require_once('camogen.svgexport.php');
+	} else {
+		throw new Exception('Sorry, unable to load the SimpleXML extension. Please check your server configuration.');
+	}
+} catch (Exception $e) {
+	die($e->getMessage());
+}
+
 class camogen
 {
-	function __construct($parameters=array())
+	function __construct($parameters=array(), $export_svg=false)
 	{
 		// @param array $parameters Pattern parameters
 
 		// Initialize the pattern object; this will store the pattern parameters and polygons that
 		// make up the camouflage pattern
-		Pattern::initialize($parameters);
+		Pattern::initialize($parameters, $export_svg);
 
 		// Generate a camouflage pattern based on the supplied parameters
 		self::generate_pattern();
@@ -255,6 +269,23 @@ class camogen
 			}
 
 			Image_Generator::save_image_to_file($filename);
+		} catch (Exception $e) {
+			die($e->getMessage());
+		}
+	}
+
+	function save_svg($filename=null)
+	{
+		try {
+			if (!Pattern::$export_svg) {
+				throw new Exception('Sorry, an error occurred (SVG cannot be saved because SVG export option is set to false)');
+			}
+
+			if ($filename == null) {
+				throw new Exception('Sorry, an error occurred (SVG filename missing)');
+			}
+
+			SVG_Export::save_svg_to_file($filename);
 		} catch (Exception $e) {
 			die($e->getMessage());
 		}

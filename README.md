@@ -14,7 +14,8 @@ The first release of this code has been codenamed **_Stealthy Salamander_**. To 
 
 ## System requirements
 
-PHP 5.4+ with Imagick or GD extensions
+- PHP 5.4+ with Imagick or GD extensions
+- SimpleXML extension (for SVG export, optional)
 
 ## How to use
 
@@ -24,6 +25,10 @@ The following scripts can be used to generate the example image set shown below:
   - Command line script to generate and save the example images
 - `camogen-examples-browser.php`
   - Browser-based script to generate and save the example images, then display them in your browser
+- `camogen-examples-cli-svg-export.php`
+  - Command line script to generate and save an example image in PNG and SVG format
+- `camogen-examples-browser-svg-export.php`
+  - Browser-based script to generate and save an example image in PNG and SVG format, then display both files in your browser
 
 Please see the comments at the top of each script for more details on how to run them.
 
@@ -93,8 +98,12 @@ The motion blur effect is not supported with GD as this effect is not easily att
 
 Anti-aliasing may not be available in some PHP installations < 7.1 because the `imageantialias()` function is only available if PHP has been compiled with the bundled version of the GD library.
 
+## SVG export
+
+Images can now be exported to SVG as well as PNG. Exporting to SVG is recommended if you want to manually edit your images in a vector art package (e.g. to apply custom fills or filter effects) or if you need the images to be resolution-independent for printing. Custom metadata is included in the SVG to store the pattern parameters, making it possible to view the XML source of a saved SVG to see which parameters were used to generate the pattern. Please note that some of the pre/post-processing effect shapes may extend beyond the viewbox of the SVG when viewed in a vector art package.
+
 ## PHP version compatibility
-- Development PHP version: PHP 7.4.33 with Imagick and GD extensions
+- Development PHP version: PHP 7.4.33 with Imagick, GD and SimpleXML extensions
 - Minimum PHP version tested: PHP 5.4.45 with GD extension
 - Maximum PHP version tested: PHP 8.2.0 with GD extension
 

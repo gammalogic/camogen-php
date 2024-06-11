@@ -25,13 +25,13 @@ interface Image_Generator_Core
 	public static function get_extension();
 	public static function set_antialiasing_mode($antialiasing);
 	public static function update_drawing();
-	public static function set_fill_color($color);
-	public static function set_stroke_color($color);
+	public static function set_fill_color($hex_color);
+	public static function set_stroke_color($hex_color);
 	public static function set_stroke_width($stroke_width);
 	public static function draw_bezier_curve($start_x, $start_y, $points);
-	public static function draw_polygon($points, $color, $apply_polygon_draw_style);
-	public static function draw_ellipse($x, $y, $radius_x, $radius_y, $start_angle, $end_angle, $color);
-	public static function draw_rectangle($x1, $y1, $x2, $y2, $color);
+	public static function draw_polygon($points, $hex_color, $apply_polygon_draw_style);
+	public static function draw_ellipse($x, $y, $radius_x, $radius_y, $start_angle, $end_angle, $hex_color);
+	public static function draw_rectangle($x1, $y1, $x2, $y2, $hex_color);
 	public static function apply_motion_blur($radius, $sigma, $angle);
 	public static function get_pixel_color($x, $y, $return_as_hex);
 	public static function get_image_type();

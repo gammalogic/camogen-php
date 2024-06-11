@@ -69,8 +69,12 @@ class Pattern
 	public static $catmull_rom_spline_tension;
 	public static $catmull_rom_spline_tension_remainder;
 	public static $is_PHP_8;
+	public static $is_PHP_7;
+	public static $is_PHP_5_5;
+	// Export options
+	public static $export_svg;
 
-	public static function initialize($parameters)
+	public static function initialize($parameters, $export_svg=false)
 	{
 		// Initialize pattern parameters
 		self::$parameters = null;
@@ -125,6 +129,19 @@ class Pattern
 		} else {
 			self::$is_PHP_8 = false;
 		}
+		if (version_compare(phpversion(), '7', '>=')) {
+			self::$is_PHP_7 = true;
+		} else {
+			self::$is_PHP_7 = false;
+		}
+		if (version_compare(phpversion(), '5.5', '>=')) {
+			self::$is_PHP_5_5 = true;
+		} else {
+			self::$is_PHP_5_5 = false;
+		}
+
+		// Export options
+		self::$export_svg = false;
 
 		try {
 			// Parse the user supplied parameters and make sure that all non-optional parameters
@@ -145,7 +162,7 @@ class Pattern
 			// Polygon size
 			self::check_parameter_value(array('polygon_size'), 'polygon size', array('valid_array_key','is_integer'));
 
-			self::$polygon_size = (int) max(10, abs($parameters['polygon_size']));
+			self::$polygon_size = (int) max(50, abs($parameters['polygon_size']));
 
 			// Polygon draw style
 			if (array_key_exists('polygon_draw_style', $parameters)) {
@@ -276,6 +293,12 @@ class Pattern
 				self::$motion_blur_radius = (int) min(abs($parameters['motion_blur']['radius']), self::$width);
 				self::$motion_blur_sigma = (int) min(abs($parameters['motion_blur']['sigma']), self::$width);
 				self::$motion_blur_angle = (int) $parameters['motion_blur']['angle'];
+			}
+
+			// Export options
+			if ($export_svg && class_exists('SVG_Export')) {
+				self::$export_svg = $export_svg;
+				SVG_Export::initialize();
 			}
 		} catch (Exception $e) {
 			die($e->getMessage());

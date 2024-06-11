@@ -58,18 +58,18 @@ class Image_Generator implements Image_Generator_Core
 		// PLACEHOLDER
 	}
 
-	public static function set_fill_color($color)
+	public static function set_fill_color($hex_color)
 	{
-		if (Helper::check_hex_color($color)) {
-			list($r,$g,$b) = Helper::get_rgb_from_hex_color($color);
+		if (Helper::check_hex_color($hex_color)) {
+			list($r,$g,$b) = Helper::get_rgb_from_hex_color($hex_color);
 			self::$fill_color = imagecolorallocate(self::$draw, $r, $g, $b);
 		}
 	}
 
-	public static function set_stroke_color($color)
+	public static function set_stroke_color($hex_color)
 	{
-		if (Helper::check_hex_color($color)) {
-			list($r,$g,$b) = Helper::get_rgb_from_hex_color($color);
+		if (Helper::check_hex_color($hex_color)) {
+			list($r,$g,$b) = Helper::get_rgb_from_hex_color($hex_color);
 			self::$stroke_color = imagecolorallocate(self::$draw, $r, $g, $b);
 		}
 	}
@@ -95,17 +95,32 @@ class Image_Generator implements Image_Generator_Core
 				$point['ye'], // end point, y
 			));
 
+			if (Pattern::$export_svg) {
+				SVG_Export::add_svg_cubic_bezier_curve(
+					array(
+						$start_x,
+						$start_y,
+						$point['x1'],
+						$point['y1'],
+						$point['x2'],
+						$point['y2'],
+						$point['xe'],
+						$point['ye'],
+					)
+				);
+			}
+
 			$start_x = $point['xe'];
 			$start_y = $point['ye'];
 		}
 	}
 
-	public static function draw_polygon($points, $color, $apply_polygon_draw_style=false)
+	public static function draw_polygon($points, $hex_color, $apply_polygon_draw_style=false)
 	{
-		if (array_key_exists($color, self::$allocated_colors)) {
-			$color = self::$allocated_colors[$color];
+		if (array_key_exists($hex_color, self::$allocated_colors)) {
+			$color = self::$allocated_colors[$hex_color];
 		} else {
-			list($r,$g,$b) = Helper::get_rgb_from_hex_color($color);
+			list($r,$g,$b) = Helper::get_rgb_from_hex_color($hex_color);
 			$color = imagecolorallocate(self::$draw, $r, $g, $b);
 		}
 
@@ -127,14 +142,21 @@ class Image_Generator implements Image_Generator_Core
 				$color
 			);
 		}
+
+		if (Pattern::$export_svg) {
+			SVG_Export::add_svg_polygon(
+				$points,
+				$hex_color
+			);
+		}
 	}
 
-	public static function draw_ellipse($x, $y, $radius_x, $radius_y, $start_angle, $end_angle, $color)
+	public static function draw_ellipse($x, $y, $radius_x, $radius_y, $start_angle, $end_angle, $hex_color)
 	{
-		if (array_key_exists($color, self::$allocated_colors)) {
-			$color = self::$allocated_colors[$color];
+		if (array_key_exists($hex_color, self::$allocated_colors)) {
+			$color = self::$allocated_colors[$hex_color];
 		} else {
-			list($r,$g,$b) = Helper::get_rgb_from_hex_color($color);
+			list($r,$g,$b) = Helper::get_rgb_from_hex_color($hex_color);
 			$color = imagecolorallocate(self::$draw, $r, $g, $b);
 		}
 
@@ -146,14 +168,23 @@ class Image_Generator implements Image_Generator_Core
 			($radius_y * 2),
 			$color
 		);
+
+		if (Pattern::$export_svg) {
+			SVG_Export::add_svg_circle(
+				$x,
+				$y,
+				$radius_x,
+				$hex_color
+			);
+		}
 	}
 
-	public static function draw_rectangle($x1, $y1, $x2, $y2, $color)
+	public static function draw_rectangle($x1, $y1, $x2, $y2, $hex_color)
 	{
-		if (array_key_exists($color, self::$allocated_colors)) {
-			$color = self::$allocated_colors[$color];
+		if (array_key_exists($hex_color, self::$allocated_colors)) {
+			$color = self::$allocated_colors[$hex_color];
 		} else {
-			list($r,$g,$b) = Helper::get_rgb_from_hex_color($color);
+			list($r,$g,$b) = Helper::get_rgb_from_hex_color($hex_color);
 			$color = imagecolorallocate(self::$draw, $r, $g, $b);
 		}
 
@@ -165,6 +196,16 @@ class Image_Generator implements Image_Generator_Core
 			$y2,
 			$color
 		);
+
+		if (Pattern::$export_svg) {
+			SVG_Export::add_svg_rectangle(
+				$x1,
+				$y1,
+				abs($x1 - $x2),
+				abs($y1 - $y2),
+				$hex_color
+			);
+		}
 	}
 
 	public static function apply_motion_blur($radius, $sigma, $angle)

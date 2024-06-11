@@ -60,14 +60,14 @@ class Image_Generator implements Image_Generator_Core
 		self::$img->drawImage(self::$draw);
 	}
 
-	public static function set_fill_color($color)
+	public static function set_fill_color($hex_color)
 	{
-		self::$draw->setFillColor($color);
+		self::$draw->setFillColor($hex_color);
 	}
 
-	public static function set_stroke_color($color)
+	public static function set_stroke_color($hex_color)
 	{
-		self::$draw->setStrokeColor($color);
+		self::$draw->setStrokeColor($hex_color);
 	}
 
 	public static function set_stroke_width($stroke_width)
@@ -89,25 +89,50 @@ class Image_Generator implements Image_Generator_Core
 				$point['xe'], // end point, x
 				$point['ye']  // end point, y
 			);
+
+			if (Pattern::$export_svg) {
+				SVG_Export::add_svg_cubic_bezier_curve(
+					array(
+						$start_x,
+						$start_y,
+						$point['x1'],
+						$point['y1'],
+						$point['x2'],
+						$point['y2'],
+						$point['xe'],
+						$point['ye'],
+					)
+				);
+			}
+
+			$start_x = $point['xe'];
+			$start_y = $point['ye'];
 		}
 
 		self::$draw->pathFinish();
 	}
 
-	public static function draw_polygon($points, $color, $apply_polygon_draw_style=false)
+	public static function draw_polygon($points, $hex_color, $apply_polygon_draw_style=false)
 	{
-		self::set_fill_color($color);
+		self::set_fill_color($hex_color);
 
 		if ($apply_polygon_draw_style && Pattern::$polygon_draw_style === 'smooth') {
 			$points = Helper::calculate_catmull_rom_spline_interpolation_points($points);
 		}
 
 		self::$draw->polygon($points);
+
+		if (Pattern::$export_svg) {
+			SVG_Export::add_svg_polygon(
+				$points,
+				$hex_color
+			);
+		}
 	}
 
-	public static function draw_ellipse($x, $y, $radius_x, $radius_y, $start_angle, $end_angle, $color)
+	public static function draw_ellipse($x, $y, $radius_x, $radius_y, $start_angle, $end_angle, $hex_color)
 	{
-		self::set_fill_color($color);
+		self::set_fill_color($hex_color);
 
 		self::$draw->ellipse(
 			$x,
@@ -117,11 +142,20 @@ class Image_Generator implements Image_Generator_Core
 			$start_angle,
 			$end_angle
 		);
+
+		if (Pattern::$export_svg) {
+			SVG_Export::add_svg_circle(
+				$x,
+				$y,
+				$radius_x,
+				$hex_color
+			);
+		}
 	}
 
-	public static function draw_rectangle($x1, $y1, $x2, $y2, $color)
+	public static function draw_rectangle($x1, $y1, $x2, $y2, $hex_color)
 	{
-		self::set_fill_color($color);
+		self::set_fill_color($hex_color);
 
 		self::$draw->rectangle(
 			$x1,
@@ -129,6 +163,16 @@ class Image_Generator implements Image_Generator_Core
 			$x2,
 			$y2
 		);
+
+		if (Pattern::$export_svg) {
+			SVG_Export::add_svg_rectangle(
+				$x1,
+				$y1,
+				abs($x1 - $x2),
+				abs($y1 - $y2),
+				$hex_color
+			);
+		}
 	}
 
 	public static function apply_motion_blur($radius, $sigma, $angle)

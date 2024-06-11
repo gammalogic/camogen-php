@@ -135,8 +135,8 @@ class Helper
 		//
 		// @param array $edge_lengths
 		// @return array $idx_edge_sorted
-		$keys = array_column($edge_lengths, 'key');
-		$distances = array_column($edge_lengths, 'distance');
+		$keys = self::array_column_pcl($edge_lengths, 'key');
+		$distances = self::array_column_pcl($edge_lengths, 'distance');
 
 		array_multisort($distances, SORT_DESC, $keys, SORT_DESC, $edge_lengths);
 
@@ -253,7 +253,7 @@ class Helper
 		}
 	}
 
-	public static function color_polygon($index, $color, $bleed)
+	public static function color_polygon($index, $color_index, $bleed)
 	{
 		// Color the polygons recursively; for $bleed values > 0, this function will identify which
 		// polygons neighbor each other and color them the same, with the effect of grouping
@@ -261,10 +261,10 @@ class Helper
 		// polygons appearing to be smaller and more dispersed
 		//
 		// @param int $index Starting index for the polygons
-		// @param int $color Color index
+		// @param int $color_index Color index
 		// @param int $bleed Recursion depth
 		$polygon = Pattern::$list_polygons[$index];
-		$polygon->color_index = $color;
+		$polygon->color_index = $color_index;
 
 		// Check whether the bleed recursion depth has been reached
 		if ($bleed > 0) {
@@ -278,7 +278,7 @@ class Helper
 			foreach ($polygon->list_neighbors as $neigh_index) {
 				if (Pattern::$list_polygons[$neigh_index]->color_index === null) {
 					$candidates[] = $neigh_index;
-					$nbr_neighbors_same_color[] = self::colored_neighbors($neigh_index, $color);
+					$nbr_neighbors_same_color[] = self::colored_neighbors($neigh_index, $color_index);
 				}
 			}
 
@@ -286,24 +286,28 @@ class Helper
 				$idx_sorted = self::reverse_sort_by_key($nbr_neighbors_same_color);
 				$idx_sorted_first_key = $idx_sorted[0]['key'];
 
-				self::color_polygon($candidates[$idx_sorted_first_key], $color, $bleed - 1);
+				self::color_polygon(
+					$candidates[$idx_sorted_first_key],
+					$color_index,
+					$bleed - 1
+				);
 			}
 		}
 	}
 
-	public static function colored_neighbors($index, $color)
+	public static function colored_neighbors($index, $color_index)
 	{
 		// Count the number of neighboring polygons with the specified color
 		//
 		// @param int $index Index of a Polygon
-		// @param int $color Color index
+		// @param int $color_index Color index
 		// @return int $count
 		$polygon = Pattern::$list_polygons[$index];
 
 		$count = (int) 0;
 
 		foreach ($polygon->list_neighbors as $neigh_index) {
-			if (Pattern::$list_polygons[$neigh_index]->color_index === $color) {
+			if (Pattern::$list_polygons[$neigh_index]->color_index === $color_index) {
 				$count++;
 			}
 		}
@@ -789,6 +793,14 @@ class Helper
 		return ($a - floor($a / $b) * $b);
 	}
 
+	public static function array_column_pcl($array, $column_key)
+	{
+		// This function is intended to replicate the array_column() function available in >= 5.5
+		return array_map(function($element) use ($column_key) {
+			return $element[$column_key];
+		}, $array);
+	}
+
 	public static function reverse_sort_by_key($array)
 	{
 		$array_temp = array();
@@ -800,8 +812,8 @@ class Helper
 			);
 		}
 
-		$keys = array_column($array_temp, 'key');
-		$values = array_column($array_temp, 'value');
+		$keys = self::array_column_pcl($array_temp, 'key');
+		$values = self::array_column_pcl($array_temp, 'value');
 
 		array_multisort($values, SORT_DESC, $keys, SORT_DESC, $array_temp);
 
