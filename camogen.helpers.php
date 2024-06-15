@@ -855,7 +855,7 @@ class Helper
 	}
 
 	// Drop-in Catmull-Rom spline calculation routines
-	public static function calculate_catmull_rom_spline_interpolation_points($p)
+	public static function calculate_catmull_rom_spline_interpolation_points($p, $closed_spline=true)
 	{
 		$pv = array();
 
@@ -869,8 +869,6 @@ class Helper
 			}
 		}
 
-		$pv[] = $pv[0];
-
 		for ($i = count($pv) - 1; $i > 0; $i--) {
 			if (Helper::dist_vertices($pv[$i], $pv[$i - 1]) < 1) {
 				array_splice($pv, $i, 1);
@@ -881,9 +879,13 @@ class Helper
 			array_splice($pv, count($pv) - 1, 1);
 		}
 
-		$pv[] = $pv[0];
-		$pv[] = $pv[1];
-		array_splice($pv, 0, 0, array($pv[count($pv) - 1]));
+		$nbr_points = count($pv);
+
+		if ($closed_spline) {
+			$pv[] = $pv[0];
+			$pv[] = $pv[1];
+			array_splice($pv, 0, 0, array($pv[$nbr_points - 1]));
+		}
 
 		$points = array();
 
@@ -894,10 +896,12 @@ class Helper
 			$p3 = $pv[$i + 2];
 
 			$p0_p1_distance = Helper::dist_vertices($p0, $p1);
+			$p1_p2_distance = Helper::dist_vertices($p1, $p2);
+			$p2_p3_distance = Helper::dist_vertices($p2, $p3);
 
 			$t01 = pow($p0_p1_distance, Pattern::$catmull_rom_spline_alpha);
-			$t12 = pow(Helper::dist_vertices($p1, $p2), Pattern::$catmull_rom_spline_alpha);
-			$t23 = pow(Helper::dist_vertices($p2, $p3), Pattern::$catmull_rom_spline_alpha);
+			$t12 = pow($p1_p2_distance, Pattern::$catmull_rom_spline_alpha);
+			$t23 = pow($p2_p3_distance, Pattern::$catmull_rom_spline_alpha);
 
 			$t0 = (float) 0;
 			$t1 = $t0 + $t01;
@@ -933,7 +937,7 @@ class Helper
 
 				// Precalculated values for optimization
 				$t_sqrd = $t * $t;
-				$t_cube = $t * $t * $t;
+				$t_cube = $t_sqrd * $t;
 
 				$px = $ax * $t_cube + $bx * $t_sqrd + $cx * $t + $dx;
 				$py = $ay * $t_cube + $by * $t_sqrd + $cy * $t + $dy;
