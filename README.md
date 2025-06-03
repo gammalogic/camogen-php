@@ -107,8 +107,6 @@ Images can now be exported to SVG as well as PNG. Exporting to SVG is recommende
 - Minimum PHP version tested: PHP 5.4.45 with GD extension
 - Maximum PHP version tested: PHP 8.2.0 with GD extension
 
-**camogen for PHP** has been written to be compatible with as many versions of PHP as possible. If you are not able to run this code on your version of PHP please raise an issue on GitHub, specifying your exact PHP version, whether you are using GD and/or Imagick, and what error messages (if any) you receive.
+## EOL Notice (June 2025)
 
-## Contact
-
-If you have any questions about the code or suggestions to improve it please submit an issue or create a new topic in the Discussions section. You can also email me here: [info@camogen-php.com](mailto:info@camogen-php.com)
+This code repository is now archived and no further updates will be made; thank you for your interest in this software. If you would like to continue development please fork the code.
